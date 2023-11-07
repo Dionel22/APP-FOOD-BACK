@@ -1,4 +1,4 @@
-const { allRecipe, addRecipe, idRecipes } = require("../../controllers/ControllerRecipe/controllerRecipe");
+const { allRecipe, addRecipe, idRecipes } = require("../../Controllers/ControllerRecipe/controllerRecipe");
 const {recipe} = require("../../db");
 
 //trae todas la receta

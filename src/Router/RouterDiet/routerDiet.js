@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const allDiets = require("../../handlers/HandlerDiet/handlerDiet");
+const allDiets = require("../../Handlers/HandlerDiet/handlerDiet");
 
 const routerDiets = Router();
 
