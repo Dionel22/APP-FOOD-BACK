@@ -1,34 +1,34 @@
-require('dotenv').config();
-const { Sequelize } = require('sequelize');
-const modelDiet = require("./models/Diet");
-const modelRecipe = require("./models/Recipe");
-const {
-  DB_USER, DB_PASSWORD, DB_HOST, DB_DATABASE
-} = process.env;
+const express = require("express");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const morgan = require("morgan");  
+const router = require("./Router/index");
 
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_DATABASE}`, {
-  logging: false,
-  native: false,
-  dialectOptions: {
-    ssl: {
-      require: true,
-    },
-  },
+require('./db.js');
+
+const server = express();
+
+
+server.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+server.use(bodyParser.json({ limit: '50mb' }));
+server.use(cookieParser());
+server.use(morgan('dev'));
+server.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*'); //http://localhost:3000  update to match the domain you will make the request from
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  next();
 });
 
-//le paso la instancia a los modelos
-modelDiet(sequelize);
-modelRecipe(sequelize);
+server.use('/', router);
 
-//modelos
-// En sequelize.models están todos los modelos importados como propiedades
-// Para relacionarlos hacemos un destructuring
-const { recipe, diet } = sequelize.models;
+// Error catching endware.
+server.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
+  const status = err.status || 500;
+  const message = err.message || err;
+  console.error(err);
+  res.status(status).send(message);
+});
 
-recipe.belongsToMany(diet, { through: 'RecipeDiet'});
-diet.belongsToMany(recipe, { through: 'RecipeDiet'});
-
-module.exports = {
-    ...sequelize.models,
-    conn: sequelize,
-} 
+module.exports = server;
