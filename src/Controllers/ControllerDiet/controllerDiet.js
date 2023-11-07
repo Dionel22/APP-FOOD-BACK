@@ -24,7 +24,6 @@ const getAllDietsDB = async () => {
     // Realiza otra consulta para obtener las dietas actualizadas
     const response = await diet.findAll({ attributes: ["name"] });
     return response;
-
 };
 
 
