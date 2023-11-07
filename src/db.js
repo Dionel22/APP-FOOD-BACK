@@ -1,12 +1,12 @@
 require('dotenv').config();
 const { Sequelize } = require('sequelize');
-const modelDiet = require("./models/Diet");
-const modelRecipe = require("./models/Recipe");
+const modelDiet = require("./Models/Diet");
+const modelRecipe = require("./Models/Recipe");
 const {
-  DB_USER, DB_PASSWORD, DB_HOST, DB_DATABASE
+  DB_USER, DB_PASSWORD, DB_HOST, DB_DATABASE, DB_PORT
 } = process.env;
 
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_DATABASE}`, {
+const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}`, {
   logging: false,
   native: false,
   dialectOptions: {
