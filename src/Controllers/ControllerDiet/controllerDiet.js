@@ -15,12 +15,23 @@ const getAllDietsDB = async () => {
         const responseDiets = responseApi.results.flatMap(e => e.diets?.map(diet => ({ name: diet })));
         return responseDiets;
       });
+      let responseApi = [,"gluten free"
+  ,"dairy free"
+  ,"lacto ovo vegetarian"
+  ,"vegan"
+  ,"paleolithic"
+  ,"primal"
+  ,"whole 30"
+  ,"pescatarian"
+  ,"ketogenic"
+ ,"fodmap friendly"
+      ]
     // Almacena las dietas en la base de datos
     responseApi.forEach(e => {
         console.log("diet", e);
       diet.findOrCreate({ where: { name: e } });
-    });
-*/
+    });*/
+
     // Realiza otra consulta para obtener las dietas actualizadas
     const response = await diet.findAll({ attributes: ["name"] });
     return response;

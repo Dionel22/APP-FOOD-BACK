@@ -18,7 +18,7 @@ module.exports = function modelRecipe (sequelize) {
       allowNull: false,
     },
     summary: {
-      type: DataTypes.STRING(1234),
+      type: DataTypes.STRING(3234),
       allowNull: false,
     },
     healthScore:{
