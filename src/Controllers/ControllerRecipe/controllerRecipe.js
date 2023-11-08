@@ -40,33 +40,9 @@ const allRecipeAPI = async () => {
 
 //busca por id en DB y API 
 const idRecipes = async (id) => {
-    if(isNaN(id)){
-        const response = await recipe.findByPk(id);
-        return response;
-    }
-    const api = await fetch(`https://api.spoonacular.com/recipes/${id}/information?apiKey=${DB_APi_KEY}`)
-    .then((data)=> data.json())
-    .then(responseApi => {
-        const responseInfo = {
-            id: responseApi.id,
-            title: responseApi.title,
-            image: responseApi.image,
-            summary: responseApi.summary.replace(/<[^>]*>/g, ""),
-            healthScore: responseApi.healthScore,
-            steps: responseApi.analyzedInstructions[0]?.steps.map((e)=>{
-                return{
-                    number: e.number,
-                    step: e.step
-                }
-            }),
-            score: responseApi.winePairing.productMatches[0]?.score,
-            diets: responseApi.diets.map((e)=> {
-                return {name: e}
-            }),
-           }
-           return responseInfo
-            })
-    return api;
+    //console.log("id", id);
+    const response = await recipe.findByPk(id,{include: { model: diet, attributes: ["name"], through: { attributes: [] } }});
+    return response;
 }
 
 // agrega Receta

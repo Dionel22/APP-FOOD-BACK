@@ -1,4 +1,4 @@
-const { Op, literal } = require('sequelize');
+const { Op } = require('sequelize');
 const { recipe, diet, conn } = require("../../db");
 
 const filted = async (filters) => {
@@ -11,9 +11,16 @@ const filted = async (filters) => {
     };
   }
 
-  const dietName = filters.diets;
+  if (filters.diets) {
+    // Si se proporciona un filtro de dieta, utilizamos una subconsulta para buscar las recetas con esa dieta.
+    const subquery = `(SELECT "recipeId" FROM "RecipeDiet" dr
+                     LEFT JOIN "diets" d ON dr."dietId" = d.id
+                     WHERE d.name = '${filters.diets}')`;
 
-  const subquery = `(SELECT "recipeId" FROM "RecipeDiet" dr LEFT JOIN "diets" d ON dr."dietId" = d.id WHERE d.name = '${dietName}')`;
+    whereClause.id = {
+      [Op.in]: conn.literal(subquery),
+    };
+  }
 
   const queryOptions = {
     where: whereClause,
@@ -22,12 +29,6 @@ const filted = async (filters) => {
       model: diet,
       attributes: ["name"],
       through: { attributes: [] },
-    },
-    where: {
-      [Op.and]: [
-        conn.literal(`"recipe"."id" IN ${subquery}`), // Usar IN para comparar con la subconsulta
-        whereClause, // Otras condiciones de búsqueda
-      ],
     },
   };
 
