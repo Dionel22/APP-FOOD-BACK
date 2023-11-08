@@ -3,8 +3,8 @@ const filted = require("../../Controllers/ControllerFilted/controllerFilted");
 const getFilteds = async (req, res) => {
     const filteds = req.query;
     try {
-        console.log(filteds)
         const response = await filted(filteds);
+        console.log(response.length)
         return res.status(200).json(response);
     } catch (error) {
         console.log("error", error.message);

@@ -1,8 +1,7 @@
-const { Op } = require('sequelize');
-const { recipe, diet } = require("../../db");
+const { Op, literal } = require('sequelize');
+const { recipe, diet, conn } = require("../../db");
 
 const filted = async (filters) => {
-  // Si no estás usando la API, construir la cláusula de búsqueda en la base de datos
   const whereClause = {};
 
   if (filters.titles) {
@@ -12,12 +11,11 @@ const filted = async (filters) => {
     };
   }
 
-  if (filters.diets) {
-    // Si se proporciona un filtro de dieta, buscamos las recetas que cumplen con esa dieta
-    whereClause['$diets.name$'] = filters.diets;
-  }
+  const dietName = filters.diets;
 
-  const result = await recipe.findAll({
+  const subquery = `(SELECT "recipeId" FROM "RecipeDiet" dr LEFT JOIN "diets" d ON dr."dietId" = d.id WHERE d.name = '${dietName}')`;
+
+  const queryOptions = {
     where: whereClause,
     attributes: ["id", "title", "image", "summary", "healthScore", "steps"],
     include: {
@@ -25,10 +23,24 @@ const filted = async (filters) => {
       attributes: ["name"],
       through: { attributes: [] },
     },
-  });
+    where: {
+      [Op.and]: [
+        conn.literal(`"recipe"."id" IN ${subquery}`), // Usar IN para comparar con la subconsulta
+        whereClause, // Otras condiciones de búsqueda
+      ],
+    },
+  };
+
+  if (filters.ascs === 'asc') {
+    queryOptions.order = [['title', 'ASC']];
+  } else if (filters.ascs === 'dec') {
+    queryOptions.order = [['title', 'DESC']];
+  }
+
+  const result = await recipe.findAll(queryOptions);
 
   return result;
-};
+}
 
 
 module.exports = filted;
