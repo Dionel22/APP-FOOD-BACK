@@ -34,6 +34,7 @@ const postRecipe = async (req, res) => {
       steps, 
       diets
     } = req.body;
+    console.log("bodys", req.body)
     try {
         const response = await addRecipe(title, image, summary, healthScore, steps, diets);
         return res.status(200).json(response);
